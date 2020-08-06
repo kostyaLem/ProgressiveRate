@@ -19,7 +19,7 @@
     </Window.DataContext>
     <DockPanel LastChildFill="True">
         <Menu Height="40" DockPanel.Dock="Top">
-            <MenuItem Padding="3">
+            <MenuItem Padding="3" Command="{Binding OpenExcelFileCommand}">
                 <MenuItem.Header>
                     <fa:ImageAwesome
                         Icon="Regular_FileExcel"
@@ -62,31 +62,26 @@
             </MenuItem>
         </Menu>
 
-        <DataGrid AutoGenerateColumns="False" ItemsSource="{Binding Records, Mode=OneWay}" ColumnWidth="*">
+        <DataGrid
+            AutoGenerateColumns="False"
+            ColumnWidth="*"
+            ItemsSource="{Binding Records, Mode=OneWay}">
             <DataGrid.Columns>
-                <DataGridTextColumn Binding="{Binding Name}"
-                                    Header="{Binding Data.ColumnHeaderNames[Name], Source={StaticResource proxy}}" />
+                <DataGridTextColumn Binding="{Binding Name}" Header="{Binding Data.ColumnHeaderNames[Name], Source={StaticResource proxy}}" />
 
-                <DataGridTextColumn Binding="{Binding DateOfArrival, StringFormat=\{0:dd.MM.yy HH:mm:ss\}}"
-                                    Header="{Binding Data.ColumnHeaderNames[DateOfArrival], Source={StaticResource proxy}}" />
+                <DataGridTextColumn Binding="{Binding DateOfArrival, StringFormat=\{0:dd.MM.yy HH:mm:ss\}}" Header="{Binding Data.ColumnHeaderNames[DateOfArrival], Source={StaticResource proxy}}" />
 
-                <DataGridTextColumn Binding="{Binding DateOfLeaving, StringFormat=\{0:dd.MM.yy HH:mm:ss\}}"
-                                    Header="{Binding Data.ColumnHeaderNames[DateOfLeaving], Source={StaticResource proxy}}" />
+                <DataGridTextColumn Binding="{Binding DateOfLeaving, StringFormat=\{0:dd.MM.yy HH:mm:ss\}}" Header="{Binding Data.ColumnHeaderNames[DateOfLeaving], Source={StaticResource proxy}}" />
 
-                <DataGridTextColumn Binding="{Binding StartOfCalc, StringFormat=\{0:dd.MM.yy HH:mm:ss\}}"
-                                    Header="{Binding Data.ColumnHeaderNames[StartOfCalc], Source={StaticResource proxy}}" />
+                <DataGridTextColumn Binding="{Binding StartOfCalc, StringFormat=\{0:dd.MM.yy HH:mm:ss\}}" Header="{Binding Data.ColumnHeaderNames[StartOfCalc], Source={StaticResource proxy}}" />
 
-                <DataGridTextColumn Binding="{Binding EndOfCalc, StringFormat=\{0:dd.MM.yy HH:mm:ss\}}"
-                                    Header="{Binding Data.ColumnHeaderNames[EndOfCalc], Source={StaticResource proxy}}" />
+                <DataGridTextColumn Binding="{Binding EndOfCalc, StringFormat=\{0:dd.MM.yy HH:mm:ss\}}" Header="{Binding Data.ColumnHeaderNames[EndOfCalc], Source={StaticResource proxy}}" />
 
-                <DataGridTextColumn Binding="{Binding StorageDaysCount}"
-                                    Header="{Binding Data.ColumnHeaderNames[StorageDaysCount], Source={StaticResource proxy}}" />
+                <DataGridTextColumn Binding="{Binding StorageDaysCount}" Header="{Binding Data.ColumnHeaderNames[StorageDaysCount], Source={StaticResource proxy}}" />
 
-                <DataGridTextColumn Binding="{Binding Rate}"
-                                    Header="{Binding Data.ColumnHeaderNames[Rate], Source={StaticResource proxy}}" />
+                <DataGridTextColumn Binding="{Binding Rate}" Header="{Binding Data.ColumnHeaderNames[Rate], Source={StaticResource proxy}}" />
 
-                <DataGridTextColumn Binding="{Binding Note}"
-                                    Header="{Binding Data.ColumnHeaderNames[Note], Source={StaticResource proxy}}" />
+                <DataGridTextColumn Binding="{Binding Note}" Header="{Binding Data.ColumnHeaderNames[Note], Source={StaticResource proxy}}" />
             </DataGrid.Columns>
         </DataGrid>
     </DockPanel>
