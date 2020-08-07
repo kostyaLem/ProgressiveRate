@@ -13,16 +13,21 @@ namespace ProgressiveRate.Services
 
     public class ExcelReader
     {
-        private const int BufferSize = 50;
+        private const int BufferSize = 256;
 
         private CancellationToken _token;
         private List<byte> _data;
         private byte[] _buffer = new byte[BufferSize];
         private string _path;
 
+        public ExcelReader()
+        {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+        }
+
         public event PositionHandler FileProcessed;
 
-        public async Task<DataTable> ReadTableAsync(string path, string sheetName, int columnsRange, CancellationToken token)
+        public async Task<DataTable> ReadTableAsync(string path, string sheetName, int columnsRange, CancellationToken token = default)
         {
             _token = token;
 
@@ -44,10 +49,17 @@ namespace ProgressiveRate.Services
                             foreach (var header in sheet.Cells[1, 1, 1, columnsRange])
                                 table.Columns.Add(header.Text);
 
-                            foreach (var row in sheet.Cells[2, 1, sheet.Dimension.End.Row, columnsRange])
+                            for (int row = 2; row <= sheet.Dimension.End.Row; row++)
                             {
-                                table.Rows.Add(row.Select(x => x.Text).Take(columnsRange));
+                                var newRow = table.NewRow();
+
+                                for (int column = 1; column <= columnsRange; column++)
+                                    newRow[column - 1] = sheet.Cells[row, column].Text;
+
+                                table.Rows.Add(newRow);
                             }
+
+                            return table;
                         }
 
                         throw new ArgumentException("Документ не содержит страницу с заданным именем", nameof(sheetName));
@@ -67,6 +79,9 @@ namespace ProgressiveRate.Services
 
                 for (int i = 0; i <= file.Length; i += BufferSize)
                 {
+                    if (_token.IsCancellationRequested)
+                        _token.ThrowIfCancellationRequested();
+
                     await file.ReadAsync(_buffer, 0, BufferSize);
 
                     await Task.Delay(50);
