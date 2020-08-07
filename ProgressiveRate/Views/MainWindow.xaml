@@ -28,7 +28,11 @@
         </Grid.RowDefinitions>
 
         <Menu Grid.Row="0">
-            <MenuItem Padding="3" Command="{Binding OpenExcelFileCommand}" />
+            <MenuItem Padding="3" Command="{Binding OpenExcelFileCommand}">
+                <MenuItem.Header>
+                    <Image Source="/Resources/Images/excel_icon.png" />
+                </MenuItem.Header>
+            </MenuItem>
 
             <Separator BorderThickness="1" />
 
@@ -54,7 +58,27 @@
                 </MenuItem.Template>
             </MenuItem>
 
-            <MenuItem Margin="20,0,0,0" Padding="3" />
+            <MenuItem
+                Margin="20,0,0,0"
+                Padding="3"
+                Command="{Binding OpenExcelFileCommand}">
+                <MenuItem.Header>
+                    <Image Source="/Resources/Images/go_icon.png" />
+                </MenuItem.Header>
+            </MenuItem>
+
+            <Separator BorderThickness="1" />
+
+            <MenuItem Margin="10,0,0,0">
+                <MenuItem.Template>
+                    <ControlTemplate>
+                        <StackPanel>
+                            <TextBlock FontWeight="DemiBold" Text="Выбранный файл:" />
+                            <TextBlock Margin="5,0,0,0" Text="{Binding SelectedFileName, Mode=OneWay}" />
+                        </StackPanel>
+                    </ControlTemplate>
+                </MenuItem.Template>
+            </MenuItem>
         </Menu>
 
 
@@ -62,6 +86,7 @@
             Grid.RowSpan="2"
             Panel.ZIndex="1"
             ReloadCommand="{Binding OpenExcelFileCommand, Mode=OneWay}"
+            Visibility="Hidden"
             Value="{Binding ProcessValue}" />
 
         <DataGrid

@@ -5,7 +5,6 @@ using ProgressiveRate.Services;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace ProgressiveRate.ViewModels
@@ -14,9 +13,12 @@ namespace ProgressiveRate.ViewModels
     {
         private CancellationTokenSource _tkn;
 
+        ICustomDialogService _dialogService = new CustomDialogService();
+
         public int ProcessValue { get; set; }
 
 
+        public string SelectedFileName { get; set; }
         public CargoStorageRecord SelectedRecord { get; set; }
 
         public Dictionary<string, string> ColumnHeaderNames { get; } = new Dictionary<string, string>();
@@ -30,30 +32,24 @@ namespace ProgressiveRate.ViewModels
             DisplayNameHelper.FillNames(typeof(CargoStorageRecord), ColumnHeaderNames);
 
             GenerateReport = new RelayCommand(Run, () => true);
-            OpenExcelFileCommand = new RelayCommand(Sho, () => true);
+            OpenExcelFileCommand = new RelayCommand(SelectFile, () => true);
         }
 
         private object _sync = new object();
 
-        private async void Run()
+        private void Run()
         {
             _tkn = new CancellationTokenSource();
 
 
         }
 
-        private async void Sho()
+        private void SelectFile()
         {
-
-            for (int i = 0; i < 1000; i++)
+            if (_dialogService.OpenFileDialog())
             {
-                lock (_sync)
-                {
-                    ProcessValue++;
-                    OnPropertyChanged(nameof(ProcessValue));
-                }
-
-                await Task.Delay(200);
+                SelectedFileName = _dialogService.FilePath;
+                OnPropertyChanged(nameof(SelectedFileName));
             }
         }
     }

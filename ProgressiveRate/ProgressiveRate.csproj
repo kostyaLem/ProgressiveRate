@@ -147,7 +147,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\Images\excel_png.png" />
+    <Resource Include="Resources\Images\excel_icon.png" />
     <Resource Include="Resources\Images\go_icon.png" />
     <Resource Include="Resources\Images\stop_icon.png" />
   </ItemGroup>
