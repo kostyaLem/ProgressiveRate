@@ -4,35 +4,60 @@ using ProgressiveRate.Models;
 using ProgressiveRate.Services;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace ProgressiveRate.ViewModels
 {
     public class MainViewModel : BaseViewModel
     {
-        private readonly ICustomDialogService _dialogService = new CustomDialogService();
+        private CancellationTokenSource _tkn;
+
+        private readonly ExcelService _excelService = new ExcelService();
+
+        public int ProcessValue { get; set; }
+
 
         public CargoStorageRecord SelectedRecord { get; set; }
 
         public Dictionary<string, string> ColumnHeaderNames { get; } = new Dictionary<string, string>();
         public ObservableCollection<CargoStorageRecord> Records { get; set; } = new ObservableCollection<CargoStorageRecord>();
 
+        public ICommand GenerateReport { get; set; }
         public ICommand OpenExcelFileCommand { get; set; }
 
         public MainViewModel()
         {
             DisplayNameHelper.FillNames(typeof(CargoStorageRecord), ColumnHeaderNames);
 
-            OpenExcelFileCommand = new RelayCommand(() => _dialogService.ShowMessage("alert", "some", System.Windows.MessageBoxImage.Information), () => true);
+            GenerateReport = new RelayCommand(Run, () => true);
+            OpenExcelFileCommand = new RelayCommand(Sho, () => true);
+        }
 
-            Records = new ObservableCollection<CargoStorageRecord>()
+        private object _sync = new object();
+
+        private async void Run()
+        {
+            _tkn = new CancellationTokenSource();
+
+            _excelService
+
+        }
+
+        private async void Sho()
+        {
+
+            for (int i = 0; i < 1000; i++)
             {
-                new CargoStorageRecord() { Note = " qwe" },
-                new CargoStorageRecord() { Note = " qwe" },
-                new CargoStorageRecord() { Note = " qwe" },
-                new CargoStorageRecord() { Note = " qwe" },
-                new CargoStorageRecord() { Note = " qwe" },
-            };
+                lock (_sync)
+                {
+                    ProcessValue++;
+                    OnPropertyChanged(nameof(ProcessValue));
+                }
+
+                await Task.Delay(200);
+            }
         }
     }
 }
