@@ -14,8 +14,6 @@ namespace ProgressiveRate.ViewModels
     {
         private CancellationTokenSource _tkn;
 
-        private readonly ExcelService _excelService = new ExcelService();
-
         public int ProcessValue { get; set; }
 
 
@@ -41,7 +39,6 @@ namespace ProgressiveRate.ViewModels
         {
             _tkn = new CancellationTokenSource();
 
-            _excelService
 
         }
 
