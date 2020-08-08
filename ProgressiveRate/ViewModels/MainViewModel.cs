@@ -2,6 +2,7 @@
 using ProgressiveRate.Helpers;
 using ProgressiveRate.Models;
 using ProgressiveRate.Services;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading;
@@ -11,46 +12,72 @@ namespace ProgressiveRate.ViewModels
 {
     public class MainViewModel : BaseViewModel
     {
+        #region Fields
+        private bool _isWaiting;
+        private double _processScore;
+        private string _selectedFileName;
+        #endregion
+
         private CancellationTokenSource _tkn;
 
+        IExcelReader _excelReader = new ExcelReader();
         ICustomDialogService _dialogService = new CustomDialogService();
 
-        public int ProcessValue { get; set; }
 
 
-        public string SelectedFileName { get; set; }
-        public CargoStorageRecord SelectedRecord { get; set; }
+        public bool IsWaiting { get => _isWaiting; private set { SetProperty(ref _isWaiting, value); } }
+        public double ProcessScore { get => _processScore; private set { SetProperty(ref _processScore, value); } }
+        public string SelectedFileName { get => _selectedFileName; private set { SetProperty(ref _selectedFileName, value); } }
 
-        public Dictionary<string, string> ColumnHeaderNames { get; } = new Dictionary<string, string>();
-        public ObservableCollection<CargoStorageRecord> Records { get; set; } = new ObservableCollection<CargoStorageRecord>();
+        public Dictionary<string, string> ColumnHeaderNames { get; }
+        public ObservableCollection<CargoStorageRecord> Records { get; private set; }
 
         public ICommand GenerateReport { get; set; }
         public ICommand OpenExcelFileCommand { get; set; }
+        public ICommand CancelCommand { get; set; }
 
         public MainViewModel()
         {
-            DisplayNameHelper.FillNames(typeof(CargoStorageRecord), ColumnHeaderNames);
+            Records = new ObservableCollection<CargoStorageRecord>();
+            ColumnHeaderNames = new Dictionary<string, string>();
+
+            _excelReader.FileProcessed += (s, value) => ProcessScore = value;
 
             GenerateReport = new RelayCommand(Run, () => true);
             OpenExcelFileCommand = new RelayCommand(SelectFile, () => true);
+            CancelCommand = new RelayCommand(CancelTask, () => true);
+
+            DisplayNameHelper.FillNames(typeof(CargoStorageRecord), ColumnHeaderNames);
         }
 
-        private object _sync = new object();
-
-        private void Run()
+        private async void Run()
         {
+            IsWaiting = true;
             _tkn = new CancellationTokenSource();
 
+            try
+            {
+                await _excelReader.ReadTableAsync(SelectedFileName, "Груз", 3, _tkn.Token);
+            }
+            catch (OperationCanceledException)
+            {
+                Records.Clear();
+            }
 
+            IsWaiting = false;
         }
 
         private void SelectFile()
         {
-            if (_dialogService.OpenFileDialog())
+            if (_dialogService.OpenFileDialog(FileExtensions.ExcelExtensions))
             {
                 SelectedFileName = _dialogService.FilePath;
-                OnPropertyChanged(nameof(SelectedFileName));
             }
+        }
+
+        private void CancelTask()
+        {
+            _tkn?.Cancel();
         }
     }
 }

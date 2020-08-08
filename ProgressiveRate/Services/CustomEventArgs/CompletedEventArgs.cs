@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ProgressiveRate.Services
+namespace ProgressiveRate.Services.CustomEventArgs
 {
     public class CompletedEventArgs : EventArgs
     {

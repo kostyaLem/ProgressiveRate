@@ -6,23 +6,23 @@ namespace ProgressiveRate.Controls
 {
     public partial class WaitIndicator : UserControl
     {
-        public int Value
+        public double Value
         {
-            get { return (int)GetValue(ValueProperty); }
+            get { return (double)GetValue(ValueProperty); }
             set { SetValue(ValueProperty, value); }
         }
 
-        public ICommand ReloadCommand
+        public ICommand CloseCommand
         {
-            get { return (ICommand)GetValue(ReloadCommandProperty); }
-            set { SetValue(ReloadCommandProperty, value); }
+            get { return (ICommand)GetValue(CloseCommandProperty); }
+            set { SetValue(CloseCommandProperty, value); }
         }
 
         public static DependencyProperty ValueProperty =
-            DependencyProperty.Register(nameof(Value), typeof(int), typeof(WaitIndicator), new PropertyMetadata(0, null, (d, e) => (int)e > 100 ? 100 : e));
+            DependencyProperty.Register(nameof(Value), typeof(double), typeof(WaitIndicator));
 
-        public static DependencyProperty ReloadCommandProperty =
-            DependencyProperty.Register(nameof(ReloadCommand), typeof(ICommand), typeof(WaitIndicator), new PropertyMetadata(null));
+        public static DependencyProperty CloseCommandProperty =
+            DependencyProperty.Register(nameof(CloseCommand), typeof(ICommand), typeof(WaitIndicator));
 
         public WaitIndicator()
         {

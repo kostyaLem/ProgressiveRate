@@ -1,13 +1,9 @@
 ﻿using ProgressiveRate.Services;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ConsoleApp1
+namespace ProgressiveRate.ConsoleTest
 {
     class Program
     {
@@ -19,13 +15,11 @@ namespace ConsoleApp1
             Task.Factory.StartNew(async () =>
             {
                 var reader = new ExcelReader();
-                reader.FileProcessed += Reader_FileProcessed1;
+                reader.FileProcessed += (s, e) => Console.WriteLine(Math.Round(e * 100, 1) + " %");
 
                 try
                 {
-                    var result = await reader.ReadTableAsync(@"C:\Users\Константин\Desktop\Test.xlsx", "Груз", 3, token);
-
-                    Console.WriteLine(result.Rows.Count);
+                    await reader.ReadTableAsync(@"C:\Users\Константин\Desktop\Test.xlsx", "Груз", 3, token);
                 }
                 catch (Exception e)
                 {
@@ -40,11 +34,6 @@ namespace ConsoleApp1
             cancellationTokenSource.Cancel();
 
             Console.ReadKey();
-        }
-
-        private static void Reader_FileProcessed1(object sender, PositionEventArgs e)
-        {
-            Console.WriteLine(Math.Round((double)e.Position / e.Length * 100, 1) + " %");
         }
     }
 }

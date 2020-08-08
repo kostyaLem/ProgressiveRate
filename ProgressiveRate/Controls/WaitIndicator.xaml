@@ -62,7 +62,7 @@
                         FontSize="16"
                         FontWeight="ExtraBold"
                         Foreground="White"
-                        Text="{Binding Value, Mode=OneWay, ElementName=root, FallbackValue=0, StringFormat={}{0}%}" />
+                        Text="{Binding Value, Mode=OneWay, ElementName=root, Converter={controls:PercentConverter}}" />
 
                     <Button
                         x:Name="CancelButton"
@@ -70,7 +70,7 @@
                         Grid.Column="1"
                         Background="{x:Null}"
                         BorderBrush="Transparent"
-                        Command="{Binding ReloadCommand, ElementName=root}">
+                        Command="{Binding CloseCommand, ElementName=root}">
 
                         <Button.Style>
                             <Style TargetType="Button">

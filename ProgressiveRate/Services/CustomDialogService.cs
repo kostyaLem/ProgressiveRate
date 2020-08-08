@@ -22,17 +22,6 @@ namespace ProgressiveRate.Services
             }
         }
 
-        public bool SaveFileDialog()
-        {
-            var saveFileDialog = new SaveFileDialog();
-            if (saveFileDialog.ShowDialog() == true)
-            {
-                FilePath = saveFileDialog.FileName;
-                return true;
-            }
-            return false;
-        }
-
         public void ShowMessage(string caption, string message, MessageBoxImage boxImage)
         {
             MessageBox.Show(message, caption, MessageBoxButton.OK, boxImage);

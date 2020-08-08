@@ -9,9 +9,7 @@ using System.Threading.Tasks;
 
 namespace ProgressiveRate.Services
 {
-    public delegate void PositionHandler(object sender, PositionEventArgs e);
-
-    public class ExcelReader
+    public class ExcelReader : IExcelReader
     {
         private const int BufferSize = 256;
 
@@ -20,12 +18,12 @@ namespace ProgressiveRate.Services
         private byte[] _buffer = new byte[BufferSize];
         private string _path;
 
+        public event EventHandler<double> FileProcessed;
+
         public ExcelReader()
         {
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
         }
-
-        public event PositionHandler FileProcessed;
 
         public async Task<DataTable> ReadTableAsync(string path, string sheetName, int columnsRange, CancellationToken token = default)
         {
@@ -33,7 +31,7 @@ namespace ProgressiveRate.Services
 
             if (columnsRange > 0)
             {
-                byte[] file = _path != path ? await ReadFile(path) : _data.ToArray();
+                byte[] file =_path != path ? await ReadFile(path) : _data.ToArray();
 
                 using (var sReader = new MemoryStream(file))
                 {
@@ -80,6 +78,8 @@ namespace ProgressiveRate.Services
                 for (int i = 0; i <= file.Length; i += BufferSize)
                 {
                     if (_token.IsCancellationRequested)
+                        
+
                         _token.ThrowIfCancellationRequested();
 
                     await file.ReadAsync(_buffer, 0, BufferSize);
@@ -88,7 +88,7 @@ namespace ProgressiveRate.Services
 
                     _data.AddRange(_buffer);
 
-                    FileProcessed?.Invoke(this, new PositionEventArgs(file.Position, file.Length));
+                    FileProcessed?.Invoke(this, (double)file.Position / file.Length);
                 }
             }
 
