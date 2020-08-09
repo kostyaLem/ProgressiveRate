@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.30320.27
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProgressiveRate", "ProgressiveRate\ProgressiveRate.csproj", "{E26DB202-5F1A-44BF-B03A-9B3A8BB377E4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProgressiveRate.ConsoleTest", "ConsoleApp1\ProgressiveRate.ConsoleTest.csproj", "{9B73240A-3D0F-4B4D-853A-51C16BA6B5B3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProgressiveRate.ConsoleTest", "ProgressiveRate.ConsoleTest\ProgressiveRate.ConsoleTest.csproj", "{9B73240A-3D0F-4B4D-853A-51C16BA6B5B3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{B70E53B0-4445-4078-AF0C-45F2FBDD3C25}"
 EndProject

@@ -60,6 +60,8 @@ namespace ProgressiveRate.ViewModels
             try
             {
                 var dataTable = await _excelReader.ReadTableAsync(SelectedFileName, "Груз", 3, _tkn.Token);
+
+                new CargoManager().DataTableToCargos(dataTable);
             }
             catch (OperationCanceledException)
             {

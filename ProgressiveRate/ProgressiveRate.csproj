@@ -113,12 +113,12 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Controls\PercentConverter.cs" />
     <Compile Include="Controls\WaitIndicator.xaml.cs">
       <DependentUpon>WaitIndicator.xaml</DependentUpon>
     </Compile>
     <Compile Include="Helpers\DisplayNameHelper.cs" />
     <Compile Include="Helpers\FileExtensions.cs" />
+    <Compile Include="Services\CargoManager.cs" />
     <Compile Include="Services\CustomEventArgs\CompletedEventArgs.cs" />
     <Compile Include="Services\CustomDialogService.cs" />
     <Compile Include="Services\ExcelService.cs" />

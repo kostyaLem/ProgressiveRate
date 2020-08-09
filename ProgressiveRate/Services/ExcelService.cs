@@ -11,7 +11,7 @@ namespace ProgressiveRate.Services
 {
     public class ExcelReader : IExcelReader
     {
-        private const int BufferSize = 256;
+        private const int BufferSize = 512;
 
         private CancellationToken _token;
         private List<byte> _data;

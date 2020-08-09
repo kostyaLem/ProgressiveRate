@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 
 namespace ProgressiveRate.Models
 {
@@ -7,13 +8,13 @@ namespace ProgressiveRate.Models
     /// </summary>
     public class Cargo
     {
-        // Название груза
+        [DisplayName("Груз")]
         public string Name { get; set; }
 
-        // Дата прихода
-        public DateTime DateOfArrival { get; set; }
+        [DisplayName("Дата прихода на склад")]
+        public DateTime? DateOfArrival { get; set; }
 
-        // Дата ухода
+        [DisplayName("Дата ухода со склада")]
         public DateTime? DateOfLeaving { get; set; }
     }
 }

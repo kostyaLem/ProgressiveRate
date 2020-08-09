@@ -63,7 +63,7 @@
                         FontSize="16"
                         FontWeight="ExtraBold"
                         Foreground="White"
-                        Text="{Binding Value, Mode=OneWay, ElementName=root, Converter={controls:PercentConverter}}" />
+                        Text="{Binding Value, Mode=OneWay, ElementName=root, StringFormat=P0}" />
 
                     <Button
                         x:Name="CancelButton"
