@@ -1,4 +1,4 @@
-﻿using GalaSoft.MvvmLight.Command;
+﻿using DevExpress.Mvvm;
 using ProgressiveRate.Helpers;
 using ProgressiveRate.Models;
 using ProgressiveRate.Services;
@@ -10,12 +10,11 @@ using System.Windows.Input;
 
 namespace ProgressiveRate.ViewModels
 {
-    public class MainViewModel : BaseViewModel
+    public class MainViewModel : ViewModelBase
     {
         #region Fields
-        private bool _isWaiting;
-        private double _processScore;
-        private string _selectedFileName;
+        private DateTime _startOfDate = DateTime.Now.AddDays(-1);
+        private DateTime _endOfDate = DateTime.Now;
         #endregion
 
         private CancellationTokenSource _tkn;
@@ -23,31 +22,34 @@ namespace ProgressiveRate.ViewModels
         IExcelReader _excelReader = new ExcelReader();
         ICustomDialogService _dialogService = new CustomDialogService();
 
+        public DateTime StartOfDate { get { return _startOfDate; } set { SetValue(ref _startOfDate, value); } }
+        public DateTime EndOfDate { get { return _endOfDate; } set { SetValue(ref _endOfDate, value); } }
+        public string SelectedFileName { get { return GetValue<string>(); } set { SetValue(value); } }
 
-
-        public bool IsWaiting { get => _isWaiting; private set { SetProperty(ref _isWaiting, value); } }
-        public double ProcessScore { get => _processScore; private set { SetProperty(ref _processScore, value); } }
-        public string SelectedFileName { get => _selectedFileName; private set { SetProperty(ref _selectedFileName, value); } }
+        public bool IsWaiting { get { return GetValue<bool>(); } set { SetValue(value); } }
+        public double ProcessScore { get { return GetValue<double>(); } set { SetValue(value); } }
 
         public Dictionary<string, string> ColumnHeaderNames { get; }
         public ObservableCollection<CargoStorageRecord> Records { get; private set; }
 
-        public ICommand GenerateReport { get; set; }
+        #region Commands
+        public ICommand GenerateReportCommand { get; set; }
+        public ICommand ClearSelectedFileCommand { get; set; }
         public ICommand OpenExcelFileCommand { get; set; }
         public ICommand CancelCommand { get; set; }
+        #endregion
 
         public MainViewModel()
         {
+            DisplayNameHelper.FillNames(typeof(CargoStorageRecord), ColumnHeaderNames = new Dictionary<string, string>());
             Records = new ObservableCollection<CargoStorageRecord>();
-            ColumnHeaderNames = new Dictionary<string, string>();
 
             _excelReader.FileProcessed += (s, value) => ProcessScore = value;
 
-            GenerateReport = new RelayCommand(Run, () => true);
-            OpenExcelFileCommand = new RelayCommand(SelectFile, () => true);
-            CancelCommand = new RelayCommand(CancelTask, () => true);
-
-            DisplayNameHelper.FillNames(typeof(CargoStorageRecord), ColumnHeaderNames);
+            GenerateReportCommand = new DelegateCommand(Run, () => StartOfDate < EndOfDate && !string.IsNullOrEmpty(SelectedFileName));
+            ClearSelectedFileCommand = new DelegateCommand(() => SelectedFileName = string.Empty, () => !string.IsNullOrEmpty(SelectedFileName));
+            OpenExcelFileCommand = new DelegateCommand(SelectFile);
+            CancelCommand = new DelegateCommand(() => _tkn.Cancel());
         }
 
         private async void Run()
@@ -57,14 +59,16 @@ namespace ProgressiveRate.ViewModels
 
             try
             {
-                await _excelReader.ReadTableAsync(SelectedFileName, "Груз", 3, _tkn.Token);
+                var dataTable = await _excelReader.ReadTableAsync(SelectedFileName, "Груз", 3, _tkn.Token);
             }
             catch (OperationCanceledException)
             {
                 Records.Clear();
             }
-
-            IsWaiting = false;
+            finally
+            {
+                IsWaiting = false;
+            }
         }
 
         private void SelectFile()
@@ -73,11 +77,6 @@ namespace ProgressiveRate.ViewModels
             {
                 SelectedFileName = _dialogService.FilePath;
             }
-        }
-
-        private void CancelTask()
-        {
-            _tkn?.Cancel();
         }
     }
 }

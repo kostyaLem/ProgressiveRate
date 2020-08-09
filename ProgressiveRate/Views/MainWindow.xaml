@@ -10,8 +10,9 @@
     Title="Реализация прогрессивной ставки по хранению простого груза"
     Width="800"
     Height="450"
-    MinWidth="600"
+    MinWidth="650"
     MinHeight="200"
+    Icon="/Resources/Images/icon.png"
     mc:Ignorable="d">
     <Window.Resources>
         <utils:BindingProxy x:Key="proxy" Data="{Binding}" />
@@ -27,10 +28,37 @@
         </Grid.RowDefinitions>
 
         <Menu Grid.Row="0">
-            <MenuItem Padding="3" Command="{Binding OpenExcelFileCommand}">
+            <MenuItem
+                Padding="3"
+                Command="{Binding OpenExcelFileCommand}"
+                ToolTip="Выбрать Excel-файл">
                 <MenuItem.Header>
                     <Image Source="/Resources/Images/excel_icon.png" />
                 </MenuItem.Header>
+            </MenuItem>
+
+            <MenuItem
+                Padding="3"
+                Command="{Binding ClearSelectedFileCommand}"
+                ToolTip="Удалить выбранный файл">
+                <MenuItem.Style>
+                    <Style TargetType="MenuItem">
+                        <Setter Property="Header">
+                            <Setter.Value>
+                                <Image Source="/Resources/Images/clear_gray_icon.png" />
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <Trigger Property="IsEnabled" Value="True">
+                                <Setter Property="Header">
+                                    <Setter.Value>
+                                        <Image Source="/Resources/Images/clear_icon.png" />
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </MenuItem.Style>
             </MenuItem>
 
             <Separator BorderThickness="1" />
@@ -40,7 +68,7 @@
                     <ControlTemplate>
                         <StackPanel>
                             <TextBlock Text="Дата начала расчета:" />
-                            <DatePicker Width="150" Text="Выбор даты ы" />
+                            <DatePicker Width="150" SelectedDate="{Binding StartOfDate}" />
                         </StackPanel>
                     </ControlTemplate>
                 </MenuItem.Template>
@@ -51,7 +79,7 @@
                     <ControlTemplate>
                         <StackPanel>
                             <TextBlock Text="Дата окончания расчета:" />
-                            <DatePicker Width="150" Text="Выбор даты ы" />
+                            <DatePicker Width="150" SelectedDate="{Binding EndOfDate}" />
                         </StackPanel>
                     </ControlTemplate>
                 </MenuItem.Template>
@@ -60,10 +88,27 @@
             <MenuItem
                 Margin="20,0,0,0"
                 Padding="3"
-                Command="{Binding GenerateReport}">
-                <MenuItem.Header>
-                    <Image Source="/Resources/Images/go_icon.png" />
-                </MenuItem.Header>
+                Command="{Binding GenerateReportCommand}"
+                ToolTip="Начать расчёт"
+                ToolTipService.ShowOnDisabled="True">
+                <MenuItem.Style>
+                    <Style TargetType="MenuItem">
+                        <Setter Property="Header">
+                            <Setter.Value>
+                                <Image Source="/Resources/Images/go_gray_icon.png" />
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <Trigger Property="IsEnabled" Value="True">
+                                <Setter Property="Header">
+                                    <Setter.Value>
+                                        <Image Source="/Resources/Images/go_icon.png" />
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </MenuItem.Style>
             </MenuItem>
 
             <Separator BorderThickness="1" />
@@ -73,7 +118,7 @@
                     <ControlTemplate>
                         <StackPanel>
                             <TextBlock FontWeight="DemiBold" Text="Выбранный файл:" />
-                            <TextBlock Margin="5,0,0,0" Text="{Binding SelectedFileName, Mode=OneWay}" />
+                            <TextBlock Text="{Binding SelectedFileName, Mode=OneWay}" />
                         </StackPanel>
                     </ControlTemplate>
                 </MenuItem.Template>
@@ -85,7 +130,7 @@
             Grid.RowSpan="2"
             Panel.ZIndex="1"
             CloseCommand="{Binding CancelCommand, Mode=OneWay}"
-            Visibility="{Binding IsWaiting, Converter={StaticResource BooleanToVisibilityConverter}}"
+            Visibility="{Binding IsWaiting,Converter={StaticResource BooleanToVisibilityConverter}}"
             Value="{Binding ProcessScore, Mode=OneWay}" />
 
         <DataGrid

@@ -10,8 +10,6 @@ namespace ProgressiveRate.Helpers
     {
         public static void FillNames(Type type, Dictionary<string, string> names)
         {
-            names.Clear();
-
             var properties = type.GetProperties().Where(x => x.GetCustomAttribute<DisplayNameAttribute>() != null);
 
             foreach (var property in properties)

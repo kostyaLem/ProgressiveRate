@@ -16,7 +16,9 @@ namespace ProgressiveRate.Services
         private CancellationToken _token;
         private List<byte> _data;
         private byte[] _buffer = new byte[BufferSize];
+
         private string _path;
+        private bool _isPreviousLoaded;
 
         public event EventHandler<double> FileProcessed;
 
@@ -31,7 +33,7 @@ namespace ProgressiveRate.Services
 
             if (columnsRange > 0)
             {
-                byte[] file =_path != path ? await ReadFile(path) : _data.ToArray();
+                byte[] file = await ReadFile(path);
 
                 using (var sReader = new MemoryStream(file))
                 {
@@ -70,20 +72,21 @@ namespace ProgressiveRate.Services
 
         private async Task<byte[]> ReadFile(string path)
         {
+            if (_path == path && _isPreviousLoaded)
+                return _data.ToArray();
+
             using (var file = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
                 _path = path;
+                _isPreviousLoaded = false;
                 _data = new List<byte>();
 
                 for (int i = 0; i <= file.Length; i += BufferSize)
                 {
                     if (_token.IsCancellationRequested)
-                        
-
                         _token.ThrowIfCancellationRequested();
 
                     await file.ReadAsync(_buffer, 0, BufferSize);
-
                     await Task.Delay(50);
 
                     _data.AddRange(_buffer);
@@ -91,6 +94,8 @@ namespace ProgressiveRate.Services
                     FileProcessed?.Invoke(this, (double)file.Position / file.Length);
                 }
             }
+
+            _isPreviousLoaded = true;
 
             return _data.ToArray();
         }
