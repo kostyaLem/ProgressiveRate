@@ -25,7 +25,9 @@ namespace ProgressiveRate.Services
 
                     var cellValue = table.Rows[i][property.GetCustomAttribute<DisplayNameAttribute>().DisplayName];
 
-                    var value = cellValue != null ? Convert.ChangeType(cellValue, pType) : null;
+                    var value = cellValue != null && cellValue != DBNull.Value ?
+                                        Convert.ChangeType(cellValue, pType) :
+                                        null;
 
                     property.SetValue(cargo, value);
                 }

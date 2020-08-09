@@ -11,7 +11,7 @@ namespace ProgressiveRate.Services
 {
     public class ExcelReader : IExcelReader
     {
-        private const int BufferSize = 512;
+        private const int BufferSize = 1024;
 
         private CancellationToken _token;
         private List<byte> _data;
@@ -54,7 +54,7 @@ namespace ProgressiveRate.Services
                                 var newRow = table.NewRow();
 
                                 for (int column = 1; column <= columnsRange; column++)
-                                    newRow[column - 1] = sheet.Cells[row, column].Text;
+                                    newRow[column - 1] = sheet.Cells[row, column].Value;
 
                                 table.Rows.Add(newRow);
                             }

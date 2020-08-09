@@ -119,7 +119,6 @@
     <Compile Include="Helpers\DisplayNameHelper.cs" />
     <Compile Include="Helpers\FileExtensions.cs" />
     <Compile Include="Services\CargoManager.cs" />
-    <Compile Include="Services\CustomEventArgs\CompletedEventArgs.cs" />
     <Compile Include="Services\CustomDialogService.cs" />
     <Compile Include="Services\ExcelService.cs" />
     <Compile Include="Services\ICustomDialogService.cs" />
