@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 
 namespace ProgressiveRate.Models
 {
@@ -7,16 +8,16 @@ namespace ProgressiveRate.Models
     /// </summary>
     public class StorageRate
     {
-        // Номер тарифа
-        public int Number { get; set; }
+        [DisplayName("№")]
+        public int? Number { get; set; }
 
-        // Начало периода
-        public DateTime StartOfPeriod { get; set; }
+        [DisplayName("Начало периода")]
+        public int? StartOfPeriod { get; set; }
 
-        // Окончание периода
-        public DateTime? EndOfPeriod { get; set; }
+        [DisplayName("Окончание периода")]
+        public int? EndOfPeriod { get; set; }
 
-        // Ставка
-        public double Rate { get; set; }
+        [DisplayName("Ставка")]
+        public double? Rate { get; set; }
     }
 }

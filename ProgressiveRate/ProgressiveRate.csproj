@@ -123,6 +123,7 @@
     <Compile Include="Services\ExcelService.cs" />
     <Compile Include="Services\ICustomDialogService.cs" />
     <Compile Include="Services\CustomEventArgs\PositionEventArgs.cs" />
+    <Compile Include="Services\IDataTableMapper.cs" />
     <Compile Include="Services\IExcelReader.cs" />
     <Compile Include="Utils\BindingProxy.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />

@@ -19,6 +19,7 @@ namespace ProgressiveRate.ViewModels
 
         private CancellationTokenSource _tkn;
 
+        CargoManager _cargoManager = new CargoManager();
         IExcelReader _excelReader = new ExcelReader();
         ICustomDialogService _dialogService = new CustomDialogService();
 
@@ -61,7 +62,6 @@ namespace ProgressiveRate.ViewModels
             {
                 var dataTable = await _excelReader.ReadTableAsync(SelectedFileName, "Груз", 3, _tkn.Token);
 
-                new CargoManager().DataTableToCargos(dataTable);
             }
             catch (OperationCanceledException)
             {
