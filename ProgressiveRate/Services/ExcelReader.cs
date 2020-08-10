@@ -63,7 +63,7 @@ namespace ProgressiveRate.Services
                         return table;
                     }
 
-                    throw new ArgumentException("Документ не содержит страницу с заданным именем", nameof(sheetName));
+                    throw new ArgumentException($"Документ не содержит страницу с заданным именем {sheetName}");
                 }
             }
         }

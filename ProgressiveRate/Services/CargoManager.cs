@@ -157,6 +157,7 @@ namespace ProgressiveRate.Services
             return result != 0 ? result + 1 : 1;
         }
 
+        #region Validates
         private Cargo[] ValidateCargos(Cargo[] cargos)
         {
             if (cargos is null || cargos.Length == 0)
@@ -212,5 +213,6 @@ namespace ProgressiveRate.Services
 
             return rates;
         }
+        #endregion
     }
 }

@@ -14,8 +14,8 @@ namespace ProgressiveRate.ViewModels
     public class MainViewModel : ViewModelBase
     {
         #region Fields
-        private DateTime _startOfDate = new DateTime(2017, 10, 08);
-        private DateTime _endOfDate = new DateTime(2017, 10, 08);
+        private DateTime _startOfDate = new DateTime(2017, 10, 1);
+        private DateTime _endOfDate = new DateTime(2017, 10, 15);
         #endregion
 
         private CancellationTokenSource _tkn;
