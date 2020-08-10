@@ -121,6 +121,7 @@
     <Compile Include="Services\CargoManager.cs" />
     <Compile Include="Services\CustomDialogService.cs" />
     <Compile Include="Services\ExcelReader.cs" />
+    <Compile Include="Services\ICargoManager.cs" />
     <Compile Include="Services\ICustomDialogService.cs" />
     <Compile Include="Services\CustomEventArgs\PositionEventArgs.cs" />
     <Compile Include="Services\DataTableMapper.cs" />

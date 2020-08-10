@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace ProgressiveRate.Services
 {
-    public class CargoManager
+    public class CargoManager : ICargoManager
     {
         public List<CargoStorageRecord> GenerateReport(Cargo[] cargos, StorageRate[] rates, DateTime beginReportDate, DateTime endReportDate)
         {
@@ -27,7 +27,7 @@ namespace ProgressiveRate.Services
                 else
                     endCalcDate = endReportDate;
 
-                endCalcDate = endCalcDate.Add(new TimeSpan(23, 59, 0));
+                endCalcDate = SetToNight(endCalcDate);
 
                 for (int i = 0; i < rates.Length; i++)
                 {

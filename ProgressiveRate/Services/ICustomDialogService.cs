@@ -5,7 +5,7 @@ namespace ProgressiveRate.Services
     /// <summary>
     /// Диалоговые окна
     /// </summary>
-    public interface ICustomDialogService
+    public interface ICustomDialog
     {
         /// <summary>
         /// Файл

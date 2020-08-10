@@ -3,7 +3,7 @@ using System.Windows;
 
 namespace ProgressiveRate.Services
 {
-    public class CustomDialogService : ICustomDialogService
+    public class CustomDialog : ICustomDialog
     {
         public string FilePath { get; private set; }
 

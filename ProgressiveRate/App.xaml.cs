@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Autofac;
+using ProgressiveRate.Services;
+using ProgressiveRate.ViewModels;
+using ProgressiveRate.Views;
 using System.Windows;
 
 namespace ProgressiveRate
@@ -13,5 +11,24 @@ namespace ProgressiveRate
     /// </summary>
     public partial class App : Application
     {
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            var container = BuildContainer();
+            new MainWindow() { DataContext = container.Resolve<MainViewModel>() }.Show();
+        }
+
+
+        private IContainer BuildContainer()
+        {
+            var builder = new ContainerBuilder();
+
+            builder.RegisterType<CargoManager>().As<ICargoManager>();
+            builder.RegisterType<CustomDialog>().As<ICustomDialog>();
+            builder.RegisterType<ExcelReader>().As<IExcelReader>();
+            builder.RegisterType<MainViewModel>().AsSelf();
+
+
+            return builder.Build();
+        }
     }
 }

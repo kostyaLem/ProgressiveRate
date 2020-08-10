@@ -20,9 +20,9 @@ namespace ProgressiveRate.ViewModels
 
         private CancellationTokenSource _tkn;
 
-        CargoManager _cargoManager = new CargoManager();
-        IExcelReader _excelReader = new ExcelReader();
-        ICustomDialogService _dialogService = new CustomDialogService();
+        readonly ICargoManager _cargoManager;
+        readonly IExcelReader _excelReader;
+        readonly ICustomDialog _custonDialog;
 
         public DateTime StartOfDate { get { return _startOfDate; } set { SetValue(ref _startOfDate, value); } }
         public DateTime EndOfDate { get { return _endOfDate; } set { SetValue(ref _endOfDate, value); } }
@@ -41,10 +41,13 @@ namespace ProgressiveRate.ViewModels
         public ICommand CancelCommand { get; set; }
         #endregion
 
-        public MainViewModel()
+        public MainViewModel(ICargoManager cargoManager, IExcelReader excelReader, ICustomDialog customDialog)
         {
+            _cargoManager = cargoManager;
+            _excelReader = excelReader;
+            _custonDialog = customDialog;
+
             DisplayNameHelper.FillNames(typeof(CargoStorageRecord), ColumnHeaderNames = new Dictionary<string, string>());
-            Records = new ObservableCollection<CargoStorageRecord>();
 
             _excelReader.FileProcessed += (s, value) => ProcessScore = value;
 
@@ -71,7 +74,7 @@ namespace ProgressiveRate.ViewModels
                 Records = new ObservableCollection<CargoStorageRecord>(records);
                 RaisePropertyChanged(nameof(Records));
 
-                _dialogService.ShowMessage("Справка", "Отчет успешно сформирован", MessageBoxImage.Information);
+                _custonDialog.ShowMessage("Справка", "Отчет успешно сформирован", MessageBoxImage.Information);
             }
             catch (OperationCanceledException)
             {
@@ -79,7 +82,7 @@ namespace ProgressiveRate.ViewModels
             }
             catch (Exception e)
             {
-                _dialogService.ShowMessage("Ошибка формирования отчета", e.Message, MessageBoxImage.Error);
+                _custonDialog.ShowMessage("Ошибка формирования отчета", e.Message, MessageBoxImage.Error);
             }
             finally
             {
@@ -89,9 +92,9 @@ namespace ProgressiveRate.ViewModels
 
         private void SelectFile()
         {
-            if (_dialogService.OpenFileDialog(FileExtensions.ExcelExtensions))
+            if (_custonDialog.OpenFileDialog(FileExtensions.ExcelExtensions))
             {
-                SelectedFileName = _dialogService.FilePath;
+                SelectedFileName = _custonDialog.FilePath;
             }
         }
     }
