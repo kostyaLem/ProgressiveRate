@@ -11,14 +11,14 @@ namespace ProgressiveRate.Services
 {
     public class ExcelReader : IExcelReader
     {
-        private const int BufferSize = 1024;
+        private const int BufferSize = 2048;
 
         private CancellationToken _token;
         private List<byte> _data;
         private byte[] _buffer = new byte[BufferSize];
 
         private string _path;
-        private bool _isPreviousLoaded;
+        private bool _previousIsLoaded;
 
         public event EventHandler<double> FileProcessed;
 
@@ -31,54 +31,59 @@ namespace ProgressiveRate.Services
         {
             _token = token;
 
-            if (columnsRange > 0)
+            byte[] file = await ReadFile(path);
+
+            using (var sReader = new MemoryStream(file))
             {
-                byte[] file = await ReadFile(path);
-
-                using (var sReader = new MemoryStream(file))
+                using (var excelPackage = new ExcelPackage(sReader))
                 {
-                    using (var excelPackage = new ExcelPackage(sReader))
+                    var book = excelPackage.Workbook;
+
+                    if (book.Worksheets.FirstOrDefault(s => s.Name == sheetName) != null)
                     {
-                        var book = excelPackage.Workbook;
+                        var sheet = book.Worksheets[sheetName];
+                        var table = new DataTable();
 
-                        if (book.Worksheets.FirstOrDefault(s => s.Name == sheetName) != null)
+                        foreach (var header in sheet.Cells[1, 1, 1, columnsRange])
+                            table.Columns.Add(header.Text);
+
+                        for (int row = 2; row <= sheet.Dimension.End.Row; row++)
                         {
-                            var sheet = book.Worksheets[sheetName];
-                            var table = new DataTable();
+                            var newRow = table.NewRow();
 
-                            foreach (var header in sheet.Cells[1, 1, 1, columnsRange])
-                                table.Columns.Add(header.Text);
+                            for (int column = 1; column <= columnsRange; column++)
+                                newRow[column - 1] = sheet.Cells[row, column].Value;
 
-                            for (int row = 2; row <= sheet.Dimension.End.Row; row++)
-                            {
-                                var newRow = table.NewRow();
+                            if (newRow.ItemArray.All(x => x == DBNull.Value))
+                                continue;
 
-                                for (int column = 1; column <= columnsRange; column++)
-                                    newRow[column - 1] = sheet.Cells[row, column].Value;
-
-                                table.Rows.Add(newRow);
-                            }
-
-                            return table;
+                            table.Rows.Add(newRow);
                         }
 
-                        throw new ArgumentException("Документ не содержит страницу с заданным именем", nameof(sheetName));
+                        return table;
                     }
+
+                    throw new ArgumentException("Документ не содержит страницу с заданным именем", nameof(sheetName));
                 }
             }
-
-            throw new ArgumentException("Кол-во столбцов не может быть отрицательным", nameof(columnsRange));
         }
 
         private async Task<byte[]> ReadFile(string path)
         {
-            if (_path == path && _isPreviousLoaded)
+            if (_path == path && _previousIsLoaded)
+            {
                 return _data.ToArray();
+            }
+            else
+            {
+                _path = path;
+                _previousIsLoaded = false;
+            }
 
             using (var file = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
                 _path = path;
-                _isPreviousLoaded = false;
+                _previousIsLoaded = false;
                 _data = new List<byte>();
 
                 for (int i = 0; i <= file.Length; i += BufferSize)
@@ -95,7 +100,7 @@ namespace ProgressiveRate.Services
                 }
             }
 
-            _isPreviousLoaded = true;
+            _previousIsLoaded = true;
 
             return _data.ToArray();
         }

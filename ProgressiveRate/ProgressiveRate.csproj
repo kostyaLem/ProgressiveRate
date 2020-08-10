@@ -120,10 +120,10 @@
     <Compile Include="Helpers\FileExtensions.cs" />
     <Compile Include="Services\CargoManager.cs" />
     <Compile Include="Services\CustomDialogService.cs" />
-    <Compile Include="Services\ExcelService.cs" />
+    <Compile Include="Services\ExcelReader.cs" />
     <Compile Include="Services\ICustomDialogService.cs" />
     <Compile Include="Services\CustomEventArgs\PositionEventArgs.cs" />
-    <Compile Include="Services\IDataTableMapper.cs" />
+    <Compile Include="Services\DataTableMapper.cs" />
     <Compile Include="Services\IExcelReader.cs" />
     <Compile Include="Utils\BindingProxy.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />

@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading;
+using System.Windows;
 using System.Windows.Input;
 
 namespace ProgressiveRate.ViewModels
@@ -13,8 +14,8 @@ namespace ProgressiveRate.ViewModels
     public class MainViewModel : ViewModelBase
     {
         #region Fields
-        private DateTime _startOfDate = DateTime.Now.AddDays(-1);
-        private DateTime _endOfDate = DateTime.Now;
+        private DateTime _startOfDate = new DateTime(2017, 10, 1);
+        private DateTime _endOfDate = new DateTime(2017, 10, 15);
         #endregion
 
         private CancellationTokenSource _tkn;
@@ -60,12 +61,25 @@ namespace ProgressiveRate.ViewModels
 
             try
             {
-                var dataTable = await _excelReader.ReadTableAsync(SelectedFileName, "Груз", 3, _tkn.Token);
+                var cargosDataTable = await _excelReader.ReadTableAsync(SelectedFileName, "Груз", 3, _tkn.Token);
+                var cargos = DataTableMapper.MapTo<Cargo>(cargosDataTable);
 
+                var ratesDataTable = await _excelReader.ReadTableAsync(SelectedFileName, "Тариф", 4, _tkn.Token);
+                var rates = DataTableMapper.MapTo<StorageRate>(ratesDataTable);
+
+                var records = _cargoManager.GenerateReport(cargos, rates, StartOfDate, EndOfDate);
+                Records = new ObservableCollection<CargoStorageRecord>(records);
+                RaisePropertyChanged(nameof(Records));
+
+                _dialogService.ShowMessage("Справка", "Отчет успешно сформирован", MessageBoxImage.Information);
             }
             catch (OperationCanceledException)
             {
                 Records.Clear();
+            }
+            catch (Exception e)
+            {
+                _dialogService.ShowMessage("Ошибка формирования отчета", e.Message, MessageBoxImage.Error);
             }
             finally
             {

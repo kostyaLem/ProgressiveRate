@@ -9,7 +9,7 @@ namespace ProgressiveRate.Services
 {
     public static class DataTableMapper
     {
-        public static T[] DataTableToCargos<T>(DataTable table)
+        public static T[] MapTo<T>(DataTable table)
         {
             var items = new List<T>();
 

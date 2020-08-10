@@ -1,6 +1,7 @@
 ﻿using DevExpress.Mvvm.Native;
 using ProgressiveRate.Models;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 
@@ -8,11 +9,92 @@ namespace ProgressiveRate.Services
 {
     public class CargoManager
     {
-        public CargoStorageRecord[] GenerateReport(Cargo[] cargos, StorageRate[] rates)
+        public List<CargoStorageRecord> GenerateReport(Cargo[] cargos, StorageRate[] rates, DateTime beginReportDate, DateTime endReportDate)
         {
             cargos = ValidateCargos(cargos);
             rates = ValidateRates(rates);
 
+            cargos = cargos.Where(c => c.DateOfArrival >= beginReportDate).ToArray();
+
+            var records = new List<CargoStorageRecord>();
+            foreach (var cargo in cargos)
+            {
+                DateTime startCalcDate = cargo.DateOfArrival.Value;
+                DateTime endCalcDate;
+
+                if (cargo.DateOfLeaving.HasValue)
+                    endCalcDate = cargo.DateOfLeaving > endReportDate ? endReportDate : cargo.DateOfLeaving.Value;
+                else
+                    endCalcDate = endReportDate;
+
+                endCalcDate = endCalcDate.Add(new TimeSpan(23, 59, 0));
+
+                for (int i = 0; i < rates.Length; i++)
+                {
+                    int currentRateDays;
+
+                    if (rates[i].EndOfPeriod.HasValue)
+                        currentRateDays = GetDeltaPeriod(rates[i].EndOfPeriod.Value, rates[i].StartOfPeriod.Value);
+                    else
+                        currentRateDays = GetTimeDifference(endCalcDate, startCalcDate);
+
+                    var tempEndCalcDate = SetToNight(startCalcDate.AddDays(currentRateDays - 1));
+
+                    if (tempEndCalcDate > endCalcDate)
+                    {
+                        tempEndCalcDate = endCalcDate;
+                        currentRateDays = GetTimeDifference(endCalcDate, startCalcDate);
+                    }
+
+                    records.Add(new CargoStorageRecord()
+                    {
+                        Name = cargo.Name,
+                        DateOfArrival = cargo.DateOfArrival.Value,
+                        DateOfLeaving = cargo.DateOfLeaving,
+                        StartOfCalc = startCalcDate,
+                        EndOfCalc = tempEndCalcDate,
+                        StorageDaysCount = currentRateDays,
+                        Rate = rates[i].Rate.Value,
+                        Note = $"Период №{i + 1}"
+                    });
+
+                    startCalcDate = SetToNewDay(tempEndCalcDate.AddDays(1));
+
+                    if (tempEndCalcDate == endCalcDate)
+                        break;
+                }
+            }
+
+            return records;
+        }
+
+        private DateTime SetToNight(DateTime date)
+        {
+            return new DateTime(date.Year, date.Month, date.Day, 23, 59, 0);
+        }
+
+        private DateTime SetToNewDay(DateTime date)
+        {
+            return new DateTime(date.Year, date.Month, date.Day);
+        }
+
+        private int GetDeltaPeriod(int endOf, int startOf)
+        {
+            if (startOf == 0)
+                return endOf;
+            else
+                return endOf - startOf + 1;
+        }
+
+        private int GetTimeDifference(DateTime d1, DateTime d2)
+        {
+            int result = default;
+            if (d1 > d2)
+                result = (d1 - d2).Days;
+            else
+                result = (d2 - d1).Days;
+
+            return result != 0 ? result + 1 : 1;
         }
 
         private Cargo[] ValidateCargos(Cargo[] cargos)
