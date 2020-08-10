@@ -136,6 +136,7 @@
             CanUserAddRows="False"
             CanUserDeleteRows="False"
             ColumnWidth="*"
+            IsReadOnly="True"
             ItemsSource="{Binding Records, Mode=OneWay}">
             <DataGrid.Resources>
                 <Style TargetType="{x:Type DataGridColumnHeader}">

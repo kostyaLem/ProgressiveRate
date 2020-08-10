@@ -14,8 +14,8 @@ namespace ProgressiveRate.ViewModels
     public class MainViewModel : ViewModelBase
     {
         #region Fields
-        private DateTime _startOfDate = new DateTime(2017, 10, 1);
-        private DateTime _endOfDate = new DateTime(2017, 10, 15);
+        private DateTime _startOfDate = new DateTime(2017, 10, 08);
+        private DateTime _endOfDate = new DateTime(2017, 10, 08);
         #endregion
 
         private CancellationTokenSource _tkn;
@@ -51,7 +51,7 @@ namespace ProgressiveRate.ViewModels
 
             _excelReader.FileProcessed += (s, value) => ProcessScore = value;
 
-            GenerateReportCommand = new DelegateCommand(Run, () => StartOfDate < EndOfDate && !string.IsNullOrEmpty(SelectedFileName));
+            GenerateReportCommand = new DelegateCommand(Run, () => StartOfDate <= EndOfDate && !string.IsNullOrEmpty(SelectedFileName));
             ClearSelectedFileCommand = new DelegateCommand(() => SelectedFileName = string.Empty, () => !string.IsNullOrEmpty(SelectedFileName));
             OpenExcelFileCommand = new DelegateCommand(SelectFile);
             CancelCommand = new DelegateCommand(() => _tkn.Cancel());

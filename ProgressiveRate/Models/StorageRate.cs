@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
 namespace ProgressiveRate.Models
 {
@@ -18,6 +17,6 @@ namespace ProgressiveRate.Models
         public int? EndOfPeriod { get; set; }
 
         [DisplayName("Ставка")]
-        public double? Rate { get; set; }
+        public int? Rate { get; set; }
     }
 }

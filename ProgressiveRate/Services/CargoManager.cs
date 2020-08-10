@@ -4,22 +4,37 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Windows.Controls;
+using System.Windows.Documents;
 
 namespace ProgressiveRate.Services
 {
     public class CargoManager : ICargoManager
     {
+        private class PeriodDate
+        {
+            public PeriodDate(DateTime startDate, DateTime endDate, int rate)
+            {
+                StartDate = startDate;
+                EndDate = endDate;
+                Rate = rate;
+            }
+
+            public DateTime StartDate { get; set; }
+            public DateTime EndDate { get; set; }
+            public int Rate { get; set; }
+        }
+
         public List<CargoStorageRecord> GenerateReport(Cargo[] cargos, StorageRate[] rates, DateTime beginReportDate, DateTime endReportDate)
         {
             cargos = ValidateCargos(cargos);
             rates = ValidateRates(rates);
 
-            cargos = cargos.Where(c => c.DateOfArrival >= beginReportDate).ToArray();
+            // cargos = cargos.Where(c => c.DateOfLeaving.HasValue && IsBetween(c.DateOfArrival.Value, c.DateOfLeaving.Value, beginReportDate) || !c.DateOfLeaving.HasValue).ToArray();
 
             var records = new List<CargoStorageRecord>();
             foreach (var cargo in cargos)
             {
-                DateTime startCalcDate = cargo.DateOfArrival.Value;
                 DateTime endCalcDate;
 
                 if (cargo.DateOfLeaving.HasValue)
@@ -29,6 +44,9 @@ namespace ProgressiveRate.Services
 
                 endCalcDate = SetToNight(endCalcDate);
 
+                var dates = new List<PeriodDate>();
+                var tempStartCalcDate = cargo.DateOfArrival.Value;
+                var tempEndCalcDate = endCalcDate;
                 for (int i = 0; i < rates.Length; i++)
                 {
                     int currentRateDays;
@@ -36,36 +54,73 @@ namespace ProgressiveRate.Services
                     if (rates[i].EndOfPeriod.HasValue)
                         currentRateDays = GetDeltaPeriod(rates[i].EndOfPeriod.Value, rates[i].StartOfPeriod.Value);
                     else
-                        currentRateDays = GetTimeDifference(endCalcDate, startCalcDate);
+                        currentRateDays = GetTimeDifference(endCalcDate, tempStartCalcDate);
 
-                    var tempEndCalcDate = SetToNight(startCalcDate.AddDays(currentRateDays - 1));
+                    tempEndCalcDate = SetToNight(tempStartCalcDate.AddDays(currentRateDays - 1));
 
-                    if (tempEndCalcDate > endCalcDate)
-                    {
-                        tempEndCalcDate = endCalcDate;
-                        currentRateDays = GetTimeDifference(endCalcDate, startCalcDate);
-                    }
+                    dates.Add(new PeriodDate(tempStartCalcDate, tempEndCalcDate, rates[i].Rate.Value));
 
+                    tempStartCalcDate = SetToNewDay(tempStartCalcDate.AddDays(currentRateDays));
+                }
+
+                var startCalcDate = cargo.DateOfArrival.Value <= beginReportDate ? beginReportDate : cargo.DateOfArrival.Value;
+
+                TruncateStartDate(dates, startCalcDate, endCalcDate);
+
+                foreach (var period in dates)
+                {
                     records.Add(new CargoStorageRecord()
                     {
                         Name = cargo.Name,
                         DateOfArrival = cargo.DateOfArrival.Value,
                         DateOfLeaving = cargo.DateOfLeaving,
-                        StartOfCalc = startCalcDate,
-                        EndOfCalc = tempEndCalcDate,
-                        StorageDaysCount = currentRateDays,
-                        Rate = rates[i].Rate.Value,
-                        Note = $"Период №{i + 1}"
+                        StartOfCalc = period.StartDate,
+                        EndOfCalc = period.EndDate,
+                        StorageDaysCount = GetTimeDifference(period.EndDate, period.StartDate),
+                        Rate = period.Rate,
+                        Note = $"Период №{dates.IndexOf(period) + 1}"
                     });
-
-                    startCalcDate = SetToNewDay(tempEndCalcDate.AddDays(1));
-
-                    if (tempEndCalcDate == endCalcDate)
-                        break;
                 }
             }
 
             return records;
+        }
+
+        private void TruncateStartDate(List<PeriodDate> periods, DateTime startDate, DateTime endDate)
+        {
+            for (int i = 0; i < periods.Count; i++)
+            {
+                if (periods.Count > 0)
+                {
+                    if (IsBetween(periods[i].StartDate, periods[i].EndDate, startDate))
+                    {
+                        periods[i].StartDate = startDate;
+                        break;
+                    }
+                    else
+                    {
+                        periods.RemoveAt(i);
+                        i--;
+                    }
+                }
+            }
+
+            for (int i = periods.Count - 1; i >= 0; i--)
+            {
+                if (periods.Count > 0)
+                {
+                    if (IsBetween(periods[i].StartDate, periods[i].EndDate, endDate))
+                    {
+                        periods[i].EndDate = endDate;
+                        return;
+                    }
+                    else
+                    {
+                        periods.RemoveAt(i);
+                        i = periods.Count;
+                    }
+                }
+            }
         }
 
         private DateTime SetToNight(DateTime date)
@@ -84,6 +139,11 @@ namespace ProgressiveRate.Services
                 return endOf;
             else
                 return endOf - startOf + 1;
+        }
+
+        private bool IsBetween(DateTime d1, DateTime d2, DateTime value)
+        {
+            return value >= d1 && value <= d2;
         }
 
         private int GetTimeDifference(DateTime d1, DateTime d2)
