@@ -30,8 +30,6 @@ namespace ProgressiveRate.Services
             cargos = ValidateCargos(cargos);
             rates = ValidateRates(rates);
 
-            // cargos = cargos.Where(c => c.DateOfLeaving.HasValue && IsBetween(c.DateOfArrival.Value, c.DateOfLeaving.Value, beginReportDate) || !c.DateOfLeaving.HasValue).ToArray();
-
             var records = new List<CargoStorageRecord>();
             foreach (var cargo in cargos)
             {
